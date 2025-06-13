@@ -1,10 +1,23 @@
-import { useState } from "react";
 import type { Deliverable } from "../types/Invoice";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import DatePickers from "./DatePickers";
+import {
+	BadgePercent,
+	CloudUpload,
+	HandCoins,
+	MailPlus,
+} from "lucide-react";
+import { Button } from "./ui/button";
+import { useEffect, useState } from "react";
 
 export default function InvoicePane() {
 	const { invoice, setInvoice, updateItem } = useInvoiceStore();
+	const [fieldsEnabled, setFieldsEnabled] = useState({
+		showDiscount: false,
+		showAdvance: false,
+		showclientEmail: false,
+		showbillerEmail: false,
+	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -27,7 +40,7 @@ export default function InvoicePane() {
 		const { name, value } = e.target;
 		setInvoice({
 			clientAddress: {
-				...invoice.clientAddress,
+				...invoice.clientAddress, // handles undefined safely
 				[name]: value,
 			},
 		});
@@ -50,165 +63,267 @@ export default function InvoicePane() {
 		);
 		const discount = invoice.discount || 0;
 		const advance = invoice.advancePaid || 0;
-		return subtotal - discount - advance;
+		const finalTotal = subtotal - discount - advance;
+		return finalTotal;
+	};
+
+	useEffect(() => {
+		const subtotal = invoice.items.reduce(
+			(sum, item) => sum + item.price * item.quantity,
+			0
+		);
+		const discount = invoice.discount || 0;
+		const advance = invoice.advancePaid || 0;
+		const finalTotal = subtotal - discount - advance;
+		setInvoice({ total: finalTotal });
+		// eslint-disable-next-line
+	}, [invoice.items, invoice.discount, invoice.advancePaid]);
+
+	const handleSubmit = () => {
+		const total = calculateTotal();
+
+		const fullInvoice = {
+			...invoice,
+			total,
+		};
+
+		console.log(JSON.stringify(fullInvoice, null, 2));
 	};
 
 	return (
 		<div className='p-6'>
-			<h1 className='text-2xl font-bold mb-4'>Create Invoice</h1>
+			<h1 className='text-2xl font-bold text-center mb-4'>Create Invoice</h1>
 
-			<div className='flex flex-col space-y-5 md:flex-row md:space-x-4 items-start'>
-				<div className='bg-gray-200 space-y-2 rounded-lg px-4 py-6 flex flex-col w-full'>
-					<h2 className='md:text-xl font-semibold text-violet-600'>
-						Billed To
-					</h2>
-					<input
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-						placeholder='Country'
-						value={invoice.clientAddress.country}
-						onChange={updateClientAddress}
-					/>
-					<input
-						type='text'
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-						name='clientName'
-						value={invoice.clientName}
-						onChange={handleChange}
-						placeholder='Client Name'
-					/>
-					<input
-						type='text'
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-						name='clientCompany'
-						value={invoice.clientCompany}
-						onChange={handleChange}
-						placeholder='Client company Name'
-					/>
-					<input
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-						placeholder='Street'
-						value={invoice.clientAddress.street}
-						onChange={updateClientAddress}
-					/>
-					<div className='flex space-x-2'>
+			<div className='flex flex-col space-y-5 items-start'>
+				<div className='flex space-y-4 flex-row space-x-4 justify-between items-start w-full '>
+					<div className='flex bg-gray-200 w-90 space-y-2 md:w-120 rounded-lg px-4 py-6 flex-col'>
+						<h1 className='md:text-xl font-semibold text-violet-600'>
+							Invoice Details
+						</h1>
+						<div className='flex flex-row space-x-4 items-center justify-between'>
+							<h2 className='text-sm font-semibold'>Invoice Number</h2>
+							<input
+								type='text'
+								name='invoiceNumber'
+								className='border-b p-2 border-gray-400 hover:border-violet-600 focus:border-gray-900 focus:outline-none'
+								value={invoice.invoiceNumber}
+								onChange={handleChange}
+								placeholder='Invoice Number'
+							/>
+						</div>
+						<div className='flex flex-row items-center justify-between'>
+							<h2 className='text-sm font-semibold'>Issue Date</h2>
+							<DatePickers label='Issue Date' dateKey='issueDate' />
+						</div>
+						<div className='flex flex-row items-center justify-between'>
+							<h2 className='text-sm font-semibold'>Due Date</h2>
+							<DatePickers
+								label='Due Date'
+								dateKey='dueDate'
+								fromDate={
+									invoice.issueDate ? new Date(invoice.issueDate) : undefined
+								}
+							/>
+						</div>
+					</div>
+					<div className='flex border border-dashed hover:border-none rounded-sm w-72 h-52 items-center justify-center'>
+						<label
+							htmlFor='logoUpload'
+							className='group flex flex-col rounded-sm items-center hover:bg-gray-300 transition-colors duration-200 justify-center cursor-pointer w-full h-full'
+						>
+							<CloudUpload className='w-10 text-violet-600 group-hover:text-violet-700 h-10 transition-colors duration-200' />
+							<h2 className='text-gray-400 font-semibold text-sm group-hover:text-gray-500 transition-colors duration-200'>
+								Upload Your logo
+							</h2>
+							<input
+								type='file'
+								name='logo'
+								id='logoUpload'
+								className='hidden'
+								accept='image/*'
+							/>
+						</label>
+					</div>
+				</div>
+				<div className='flex flex-col space-y-4 md:flex-row md:space-x-4 items-start w-full'>
+					<div className='bg-gray-200 space-y-2 rounded-lg px-4 py-6 flex flex-col w-full'>
+						<h2 className='md:text-xl font-semibold text-violet-600'>
+							Billed To
+						</h2>
 						<input
-							className='border-b p-2 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
-							placeholder='City'
-							value={invoice.clientAddress.city}
+							className='border-b p-2 border-gray-400 hover:border-violet-600 focus:border-gray-900 focus:outline-none'
+							placeholder='Country'
+							name='country'
+							value={invoice.clientAddress?.country}
 							onChange={updateClientAddress}
 						/>
 						<input
-							className='border-b p-2 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
-							placeholder='Postal Code'
-							value={invoice.clientAddress.postalCode}
-							onChange={updateClientAddress}
-						/>
-					</div>
-					<input
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-						placeholder='State'
-						value={invoice.clientAddress.state}
-						onChange={updateClientAddress}
-					/>
-
-					<input
-						name='clientMobile'
-						value={invoice.clientMobile}
-						onChange={handleChange}
-						placeholder='Client Mobile'
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-					/>
-					<input
-						name='clientEmail'
-						value={invoice.clientEmail}
-						onChange={handleChange}
-						placeholder='Client Email'
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-					/>
-				</div>
-
-				<div className='bg-gray-200 space-y-2 rounded-lg px-4 py-6 flex flex-col w-full'>
-					<h2 className='md:text-xl font-semibold text-violet-600'>
-						Billed By
-					</h2>
-					<input
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-						placeholder='Country'
-						value={invoice.billerAddress.country}
-						onChange={updatebillerAddress}
-					/>
-					<input
-						type='text'
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-						name='billerName'
-						value={invoice.billerName}
-						onChange={handleChange}
-						placeholder='Biller Name'
-					/>
-					<input
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-						placeholder='Street'
-						value={invoice.billerAddress.street}
-						onChange={updatebillerAddress}
-					/>
-					<div className='flex space-x-2'>
-						<input
-							className='border-b p-2 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
-							placeholder='City'
-							value={invoice.billerAddress.city}
-							onChange={updatebillerAddress}
-						/>
-						<input
-							className='border-b p-2 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
-							placeholder='Postal Code'
-							value={invoice.billerAddress.postalCode}
-							onChange={updatebillerAddress}
-						/>
-					</div>
-					<input
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-						placeholder='State'
-						value={invoice.billerAddress.state}
-						onChange={updatebillerAddress}
-					/>
-
-					<input
-						name='BillerMobile'
-						value={invoice.billerMobile}
-						onChange={handleChange}
-						placeholder='Biller Mobile'
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-					/>
-					<input
-						name='billerEmail'
-						value={invoice.billerEmail}
-						onChange={handleChange}
-						placeholder='Biller Email'
-						className='border-b p-2 border-gray-400 focus:border-gray-900 focus:outline-none'
-					/>
-				</div>
-
-				<div className='bg-gray-200 space-y-2 rounded-lg px-4 py-6 flex flex-col w-full'>
-					<h1 className='md:text-xl font-semibold text-violet-600'>
-						Invoice Details
-					</h1>
-					<div className='flex flex-row items-center justify-between'>
-						<h2 className='text-sm font-semibold'>Invoice Number</h2>
-						<input
-							name='invoiceNumber'
-							value={invoice.invoiceNumber}
+							type='text'
+							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+							name='clientName'
+							value={invoice.clientName}
 							onChange={handleChange}
-							placeholder='Invoice Number'
-							className='border-b p-1 border-gray-400 focus:border-gray-900 focus:outline-none'
+							placeholder='Client Name/ Business Name'
 						/>
+						<input
+							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+							placeholder='Street'
+							name='street'
+							value={invoice.clientAddress?.street}
+							onChange={updateClientAddress}
+						/>
+						<div className='flex space-x-2'>
+							<input
+								className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
+								placeholder='City'
+								name='city'
+								value={invoice.clientAddress?.city}
+								onChange={updateClientAddress}
+							/>
+							<input
+								className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
+								placeholder='Postal Code'
+								name='postalCode'
+								value={invoice.clientAddress?.postalCode}
+								onChange={updateClientAddress}
+							/>
+						</div>
+						<input
+							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+							placeholder='State'
+							name='state'
+							value={invoice.clientAddress?.state}
+							onChange={updateClientAddress}
+						/>
+
+						<input
+							name='clientMobile'
+							value={invoice.clientMobile}
+							onChange={handleChange}
+							placeholder='Client Mobile'
+							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+						/>
+						{fieldsEnabled.showclientEmail ? (
+							<input
+								name='clientEmail'
+								value={invoice.clientEmail}
+								onChange={handleChange}
+								placeholder='Client Email'
+								className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+							/>
+						) : (
+							""
+						)}
+						<div className='flex space-x-2'>
+							{fieldsEnabled.showclientEmail ? (
+								""
+							) : (
+								<div
+									className='group flex p-2 space-x-2 items-center cursor-pointer'
+									onClick={() =>
+										setFieldsEnabled((prev) => ({
+											...prev,
+											showclientEmail: true,
+										}))
+									}
+								>
+									<MailPlus className='w-5 group-hover:text-violet-400 transition-colors duration-300' />
+									<p className='text-sm text-gray-500 group-hover:text-violet-400 transition-colors duration-300 font-semibold'>
+										Add Email
+									</p>
+								</div>
+							)}
+						</div>
 					</div>
-					<div className='flex flex-row items-center justify-between'>
-						<h2 className='text-sm font-semibold'>Issue Date</h2>
-						<DatePickers label='Issue Date' dateKey='issueDate' />
-					</div>
-					<div className='flex flex-row items-center justify-between'>
-						<h2 className='text-sm font-semibold'>Due Date</h2>
-						<DatePickers label='Due Date' dateKey='dueDate' />
+
+					<div className='bg-gray-200 space-y-2 rounded-lg px-4 py-6 flex flex-col w-full'>
+						<h2 className='md:text-xl font-semibold text-violet-600'>
+							Billed By
+						</h2>
+						<input
+							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+							placeholder='Country'
+							name='country'
+							value={invoice.billerAddress?.country}
+							onChange={updatebillerAddress}
+						/>
+						<input
+							type='text'
+							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+							name='billerName'
+							value={invoice.billerName}
+							onChange={handleChange}
+							placeholder='Biller Name/ Business Name'
+						/>
+						<input
+							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+							placeholder='Street'
+							name='street'
+							value={invoice.billerAddress?.street}
+							onChange={updatebillerAddress}
+						/>
+						<div className='flex space-x-2'>
+							<input
+								className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
+								placeholder='City'
+								name='city'
+								value={invoice.billerAddress?.city}
+								onChange={updatebillerAddress}
+							/>
+							<input
+								className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
+								placeholder='Postal Code'
+								name='postalCode'
+								value={invoice.billerAddress?.postalCode}
+								onChange={updatebillerAddress}
+							/>
+						</div>
+						<input
+							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+							placeholder='State'
+							name='state'
+							value={invoice.billerAddress?.state}
+							onChange={updatebillerAddress}
+						/>
+
+						<input
+							name='billerMobile'
+							value={invoice.billerMobile}
+							onChange={handleChange}
+							placeholder='Biller Mobile'
+							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+						/>
+						{fieldsEnabled.showbillerEmail ? (
+							<input
+								name='billerEmail'
+								value={invoice.billerEmail}
+								onChange={handleChange}
+								placeholder='Biller Email'
+								className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
+							/>
+						) : (
+							""
+						)}
+						<div className='flex space-x-2'>
+							{fieldsEnabled.showbillerEmail ? (
+								""
+							) : (
+								<div
+									className='group flex p-2 space-x-2 items-center cursor-pointer'
+									onClick={() =>
+										setFieldsEnabled((prev) => ({
+											...prev,
+											showbillerEmail: true,
+										}))
+									}
+								>
+									<MailPlus className='w-5 group-hover:text-violet-400 transition-colors duration-300' />
+									<p className='text-sm text-gray-500 group-hover:text-violet-400 transition-colors duration-300 font-semibold'>
+										Add Email
+									</p>
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -250,7 +365,7 @@ export default function InvoicePane() {
 				))}
 				<button
 					onClick={addItem}
-					className='mb-4 bg-violet-600 hover:bg-violet-500 w-full transition-transform hover:scale-101 duration-300 ease-in-out text-white px-4 py-2 rounded'
+					className='mb-4 bg-violet-600 hover:bg-violet-700 w-full transition-colors duration-300 ease-in text-white px-4 py-2 rounded'
 				>
 					Add Item
 				</button>
@@ -258,32 +373,74 @@ export default function InvoicePane() {
 
 			<hr className='my-4' />
 			<div className='mb-4'>
-				<div className='flex items-center justify-between'>
-					<h2 className='font-semibold'>Discount</h2>
-					<input
-						name='discount'
-						className='border-b-2 border-gray-500 focus:outline-none text-end p-2 mr-2'
-						placeholder='0'
-						value={invoice.discount}
-						onChange={handleChange}
-					/>
-				</div>
-				<div className='flex items-center justify-between'>
-					<h2 className='font-semibold'>Advance</h2>
-					<input
-						name='advancePaid'
-						className='border-b-2 border-gray-500 focus:outline-none text-end p-2 mr-2'
-						placeholder='0'
-						value={invoice.advancePaid}
-						onChange={handleChange}
-					/>
-				</div>
+				{fieldsEnabled.showDiscount ? (
+					<div className='flex items-center justify-between'>
+						<h2 className='font-semibold'>Discount</h2>
+						<input
+							name='discount'
+							className='border-b-2 border-gray-500 hover:border-violet-400 focus:outline-none text-end p-2 mr-2'
+							placeholder='0'
+							value={invoice.discount}
+							onChange={handleChange}
+						/>
+					</div>
+				) : (
+					<div
+						className='group flex p-2 space-x-2 items-center cursor-pointer'
+						onClick={() =>
+							setFieldsEnabled((prev) => ({
+								...prev,
+								showDiscount: true,
+							}))
+						}
+					>
+						<BadgePercent className='w-5 group-hover:text-violet-400 transition-colors duration-300' />
+						<p className='text-sm text-gray-500 group-hover:text-violet-400 transition-colors duration-300 font-semibold'>
+							Add Discount
+						</p>
+					</div>
+				)}
+				{fieldsEnabled.showAdvance ? (
+					<div className='flex items-center justify-between'>
+						<h2 className='font-semibold'>Advance</h2>
+						<input
+							name='advancePaid'
+							className='border-b-2 border-gray-500 focus:outline-none text-end p-2 mr-2'
+							placeholder='0'
+							value={invoice.advancePaid}
+							onChange={handleChange}
+						/>
+					</div>
+				) : (
+					<div
+						className='group flex p-2 space-x-2 items-center cursor-pointer '
+						onClick={() =>
+							setFieldsEnabled((prev) => ({
+								...prev,
+								showAdvance: true,
+							}))
+						}
+					>
+						<HandCoins className='w-5 group-hover:text-violet-400 transition-colors duration-300' />
+						<p className='text-sm group-hover:text-violet-400 transition-colors duration-300 text-gray-500 font-semibold'>
+							Add Advance
+						</p>
+					</div>
+				)}
 			</div>
 
 			<hr />
 			<div className='flex items-center justify-between'>
 				<h2 className='text-lg font-semibold mt-4'>Total</h2>
 				<h2 className='font-semibold text-2xl'>₹{calculateTotal()}</h2>
+			</div>
+			<div className='text-center mt-10'>
+				<Button
+					className='bg-violet-600 hover:bg-violet-600 hover:scale-105 '
+					onClick={handleSubmit}
+				>
+					Prepare invoice
+				</Button>
 			</div>
 		</div>
 	);

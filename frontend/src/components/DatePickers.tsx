@@ -1,5 +1,5 @@
 "use client";
-
+import React from "react";
 import { format } from "date-fns";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import { CalendarIcon } from "lucide-react";
@@ -15,16 +15,21 @@ import {
 export default function DatePickers({
 	label,
 	dateKey,
+	fromDate,
 }: {
 	label: string;
 	dateKey: "issueDate" | "dueDate";
+	fromDate?: Date;
 }) {
 	const { invoice, setInvoice } = useInvoiceStore();
 	const selectedDate = invoice[dateKey]
 		? new Date(invoice[dateKey])
 		: undefined;
+
+	const [open, setOpen] = React.useState(false);
+
 	return (
-		<Popover>
+		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button
 					variant={"outline"}
@@ -45,15 +50,20 @@ export default function DatePickers({
 				<Calendar
 					mode='single'
 					selected={selectedDate}
-					onSelect={(date) =>
-						date && setInvoice({ [dateKey]: date.toISOString() })
-					}
+					onSelect={(date) => {
+						if (date) {
+							setInvoice({ [dateKey]: date.toISOString() });
+							setTimeout(() => setOpen(false), 200); // 150ms for transition
+						}
+					}}
+					disabled={{ before: fromDate }}
 					captionLayout='dropdown'
 					classNames={{
 						day: "rounded-md border border-transparent text-gray-900 hover:bg-gray-200",
-						selected: "bg-violet-400 text-white hover:bg-violet-300",
+						selected: "bg-violet-400 hover:bg-violet-300",
 						today: "border border-gray-400 bg-violet-200",
-						disabled: "text-gray-400 pointer-events-none",
+						disabled:
+							"text-gray-400 pointer-events-none",
 						outside: "text-gray-400 opacity-50", // container for dropdown
 						dropdown_root:
 							"relative has-focus:border-ring border border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-1 rounded-md",

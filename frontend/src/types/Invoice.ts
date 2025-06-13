@@ -1,14 +1,14 @@
 export interface Address {
-	street: string;
-	city: string;
-	state: string;
-	postalCode: string;
-	country: string;
+	street: string | undefined;
+	city: string | undefined;
+	state: string | undefined;
+	postalCode: string | undefined;
+	country: string | undefined;
 }
 
 export interface Deliverable {
 	id: string;
-	description: string;
+	name: string;
 	quantity: number;
 	price: number;
 }
@@ -16,14 +16,13 @@ export interface Deliverable {
 export interface Invoice {
 	// Client Details
 	clientName: string;
-	clientCompany: string;
-	clientAddress: Address;
+	clientAddress?: Address;
 	clientEmail: string;
 	clientMobile: string;
 
 	// Biller Details
 	billerName: string;
-	billerAddress: Address;
+	billerAddress?: Address;
 	billerEmail: string;
 	billerMobile: string;
 
@@ -39,5 +38,5 @@ export interface Invoice {
 	discount?: number;
 	advancePaid?: number;
 	total: number;
-	status: "paid" | "unpaid";
+	status: "paid" | "unpaid" | "pending";
 }
