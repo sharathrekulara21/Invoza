@@ -1,14 +1,12 @@
 import type { Deliverable } from "../types/Invoice";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import DatePickers from "./DatePickers";
-import {
-	BadgePercent,
-	CloudUpload,
-	HandCoins,
-	MailPlus,
-} from "lucide-react";
+import { BadgePercent, CloudUpload, HandCoins, MailPlus } from "lucide-react";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { CountryPicker } from "./CountryPicker";
+import { StatePicker } from "./StatePicker";
 
 export default function InvoicePane() {
 	const { invoice, setInvoice, updateItem } = useInvoiceStore();
@@ -150,13 +148,7 @@ export default function InvoicePane() {
 						<h2 className='md:text-xl font-semibold text-violet-600'>
 							Billed To
 						</h2>
-						<input
-							className='border-b p-2 border-gray-400 hover:border-violet-600 focus:border-gray-900 focus:outline-none'
-							placeholder='Country'
-							name='country'
-							value={invoice.clientAddress?.country}
-							onChange={updateClientAddress}
-						/>
+						<CountryPicker type='client' />
 						<input
 							type='text'
 							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
@@ -188,12 +180,9 @@ export default function InvoicePane() {
 								onChange={updateClientAddress}
 							/>
 						</div>
-						<input
-							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
-							placeholder='State'
-							name='state'
-							value={invoice.clientAddress?.state}
-							onChange={updateClientAddress}
+						<StatePicker
+							type='client'
+							country={invoice.clientAddress?.country}
 						/>
 
 						<input
@@ -240,13 +229,7 @@ export default function InvoicePane() {
 						<h2 className='md:text-xl font-semibold text-violet-600'>
 							Billed By
 						</h2>
-						<input
-							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
-							placeholder='Country'
-							name='country'
-							value={invoice.billerAddress?.country}
-							onChange={updatebillerAddress}
-						/>
+						<CountryPicker type='biller' />
 						<input
 							type='text'
 							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
@@ -278,14 +261,10 @@ export default function InvoicePane() {
 								onChange={updatebillerAddress}
 							/>
 						</div>
-						<input
-							className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
-							placeholder='State'
-							name='state'
-							value={invoice.billerAddress?.state}
-							onChange={updatebillerAddress}
+						<StatePicker
+							type='biller'
+							country={invoice.billerAddress?.country}
 						/>
-
 						<input
 							name='billerMobile'
 							value={invoice.billerMobile}

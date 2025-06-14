@@ -1,6 +1,5 @@
 import InvoicePane from "./components/InvoicePane";
 import PreviewPane from "./components/PreviewPane";
-import PrintablePreview from "./components/PrintablePreview";
 
 function App() {
 	return (

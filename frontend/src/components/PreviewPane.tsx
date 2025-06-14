@@ -7,13 +7,6 @@ export default function PreviewPane() {
 
 	return (
 		<div className='bg-[#C4D9FF] '>
-			<PDFDownloadLink
-				document={<PrintablePreview />}
-				fileName='invoice.pdf'
-				className='bg-blue-500 text-white px-4 py-2 rounded'
-			>
-				{({ loading }) => (loading ? "Preparing..." : "Download PDF")}
-			</PDFDownloadLink>
 			<div className='bg-[#FBFBFB] rounded-b-4xl p-4 mb-4'>
 				<h2 className='text-2xl text-center font-bold'>Invoice Preview</h2>
 			</div>
@@ -61,9 +54,9 @@ export default function PreviewPane() {
 						<h2 className='md:text-xl font-semibold text-violet-600'>
 							Billed To
 						</h2>
-						{invoice.clientAddress?.country?.trim() && (
+						{invoice.clientAddress?.country?.name.trim() && (
 							<p className='text-md font-semibold'>
-								{invoice.clientAddress?.country}
+								{invoice.clientAddress?.country.name}
 							</p>
 						)}
 						{invoice.clientName?.trim() && (
@@ -104,9 +97,9 @@ export default function PreviewPane() {
 						<h2 className='md:text-xl font-semibold text-violet-600'>
 							Billed By
 						</h2>
-						{invoice.billerAddress?.country?.trim() && (
+						{invoice.billerAddress?.country?.name.trim() && (
 							<p className='text-md font-semibold'>
-								{invoice.billerAddress?.country}
+								{invoice.billerAddress?.country.name}
 							</p>
 						)}
 						{invoice.billerName?.trim() && (

@@ -3,8 +3,17 @@ export interface Address {
 	city: string | undefined;
 	state: string | undefined;
 	postalCode: string | undefined;
-	country: string | undefined;
+	country: CountryDetails | undefined;
 }
+
+type CountryDetails = {
+	name: string | "";
+	iso2: string | "";
+	currency: string | "";
+	phonecode: string | "";
+	flag: string | "";
+	// ...other fields from API if needed
+};
 
 export interface Deliverable {
 	id: string;
