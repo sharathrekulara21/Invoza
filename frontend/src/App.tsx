@@ -9,7 +9,7 @@ function App() {
 					{/* Your InvoicePane (Form) */}
 					<InvoicePane />
 				</div>
-				<div className='md:w-1/2 border rounded-lg p-4 shadow-sm bg-green-900'>
+				<div className='md:w-1/2 border rounded-lg p-4 shadow-sm'>
 					<PreviewPane />
 				</div>
 			</div>
