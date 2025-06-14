@@ -4,7 +4,6 @@ import DatePickers from "./DatePickers";
 import { BadgePercent, CloudUpload, HandCoins, MailPlus } from "lucide-react";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { CountryPicker } from "./CountryPicker";
 import { StatePicker } from "./StatePicker";
 
