@@ -52,8 +52,12 @@ export default function DatePickers({
 					selected={selectedDate}
 					onSelect={(date) => {
 						if (date) {
-							setInvoice({ [dateKey]: date.toISOString() });
-							setTimeout(() => setOpen(false), 200); // 150ms for transition
+							const year = date.getFullYear();
+							const month = String(date.getMonth() + 1).padStart(2, "0");
+							const day = String(date.getDate()).padStart(2, "0");
+							const formatted = `${year}-${month}-${day}`;
+							setInvoice({ [dateKey]: formatted });
+							setTimeout(() => setOpen(false), 200);
 						}
 					}}
 					disabled={{ before: fromDate }}
@@ -62,8 +66,7 @@ export default function DatePickers({
 						day: "rounded-md border border-transparent text-gray-900 hover:bg-gray-200",
 						selected: "bg-violet-400 hover:bg-violet-300",
 						today: "border border-gray-400 bg-violet-200",
-						disabled:
-							"text-gray-400 pointer-events-none",
+						disabled: "text-gray-400 pointer-events-none",
 						outside: "text-gray-400 opacity-50", // container for dropdown
 						dropdown_root:
 							"relative has-focus:border-ring border border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-1 rounded-md",

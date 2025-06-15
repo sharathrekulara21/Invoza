@@ -1,5 +1,5 @@
-import InvoicePane from "./components/InvoicePane";
-import PreviewPane from "./components/PreviewPane";
+import InvoicePane from "./pages/InvoicePane";
+import PreviewPane from "./pages/PreviewPane";
 
 function App() {
 	return (
