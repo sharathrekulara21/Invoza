@@ -1,29 +1,44 @@
 import type { Deliverable } from "../types/Invoice";
 import { useInvoiceStore } from "@/store/invoiceStore";
-import DatePickers from "../utils/DatePickers";
-import { BadgePercent, CloudUpload, HandCoins, MailPlus } from "lucide-react";
+import { BadgePercent, CloudUpload, PenTool } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { useEffect, useState } from "react";
-import { CountryPicker } from "../utils/CountryPicker";
-import { StatePicker } from "../utils/StatePicker";
+import { useEffect, useRef, useState } from "react";
 import InvoiceDetails from "@/components/invoicePane/InvoiceDetails";
 import BilledTo from "@/components/invoicePane/BilledTo";
 import BilledBy from "@/components/invoicePane/BilledBy";
 import Deliverables from "@/components/invoicePane/Deliverables";
 import AdditionalFields from "@/components/invoicePane/AdditionalFields";
+import SignaturePad from "@/components/invoicePane/SignaturePad";
 
 export default function InvoicePane() {
 	const { invoice, setInvoice, updateItem } = useInvoiceStore();
+	const [logoImage, setLogoImage] = useState("");
 	const [fieldsEnabled, setFieldsEnabled] = useState({
 		showDiscount: false,
 		showAdvance: false,
 		showclientEmail: false,
 		showbillerEmail: false,
+		showSignaturePad: false,
+		showAddNote: false,
+		showTerms: false,
 	});
+	const hiddenFileInput = useRef<HTMLInputElement>(null);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setInvoice({ [name]: value });
+	};
+
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setLogoImage(reader.result as string);
+			setInvoice({ ...invoice, logo: reader.result as string });
+		};
+		reader.readAsDataURL(file);
 	};
 
 	const [nextDeliverableId, setNextDeliverableId] = useState(1);
@@ -95,6 +110,8 @@ export default function InvoicePane() {
 								type='file'
 								name='logo'
 								id='logoUpload'
+								onChange={handleFileChange}
+								ref={hiddenFileInput}
 								className='hidden'
 								accept='image/*'
 							/>
@@ -132,8 +149,30 @@ export default function InvoicePane() {
 				fieldsEnabled={fieldsEnabled}
 				setFieldsEnabled={setFieldsEnabled}
 			/>
+			{fieldsEnabled.showSignaturePad ? (
+				<div
+					className='fixed inset-0 z-50 flex items-center justify-center  bg-opacity-40'
+					style={{ minHeight: "100vh" }}
+				>
+					<div className='bg-white rounded-lg shadow-lg p-6 max-w-lg w-full'>
+						<SignaturePad setFieldsEnabled={setFieldsEnabled} />
+					</div>
+				</div>
+			) : (
+				<div
+					className='group flex flex-col border border-dashed hover:border-none hover:bg-gray-300 hover:cursor-pointer rounded-sm w-72 h-52 items-center space-y-2 justify-center'
+					onClick={() =>
+						setFieldsEnabled((prev) => ({ ...prev, showSignaturePad: true }))
+					}
+				>
+					<PenTool className='w-10 text-violet-600 group-hover:text-violet-700 h-10 transition-colors duration-200' />
+					<h2 className='text-gray-400 font-semibold text-sm group-hover:text-gray-500 transition-colors duration-200'>
+						Click to add your signature
+					</h2>
+				</div>
+			)}
 
-			<hr />
+			<hr className="my-4" />
 			<div className='flex items-center justify-between'>
 				<h2 className='text-lg font-semibold mt-4'>Total</h2>
 				<h2 className='font-semibold text-2xl'>{calculateTotal()}</h2>

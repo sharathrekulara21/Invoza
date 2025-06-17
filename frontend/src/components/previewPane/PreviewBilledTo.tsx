@@ -1,43 +1,43 @@
-import React from 'react'
+import React from "react";
 
-type Props = {invoice:invoice}
+type Props = { invoice: invoice; style: style };
 
-function PreviewBilledTo({invoice}: Props) {
-  return (
-		<div className='bg-[#FBFBFB] space-y-1 rounded-lg px-4 py-6 flex flex-col w-full'>
-			<h2 className='md:text-xl font-semibold text-violet-600'>Billed To</h2>
+function PreviewBilledTo({ invoice, style }: Props) {
+	return (
+		<div style={style.mainDiv}>
+			<h2 style={style.sectionTitle}>Billed To</h2>
 			{invoice.clientAddress?.country?.name.trim() && (
-				<p className='text-md font-semibold'>
+				<p style={style.value}>
 					{invoice.clientAddress?.country.name}
 				</p>
 			)}
 			{invoice.clientName?.trim() && (
-				<p className='text-md font-semibold'>{invoice.clientName}</p>
+				<p style={style.value}>{invoice.clientName}</p>
 			)}
 			{invoice.clientAddress?.street?.trim() && (
-				<p className='text-md font-semibold'>{invoice.clientAddress?.street}</p>
+				<p style={style.value}>{invoice.clientAddress?.street}</p>
 			)}
-			<div className='flex space-x-2'>
+			<div style={style.row}>
 				{invoice.clientAddress?.city?.trim() && (
-					<p className='text-md font-semibold'>{invoice.clientAddress?.city}</p>
+					<p style={style.value}>{invoice.clientAddress?.city}</p>
 				)}
 				{invoice.clientAddress?.postalCode?.trim() && (
-					<p className='text-md font-semibold'>
+					<p style={style.value}>
 						{invoice.clientAddress?.postalCode}
 					</p>
 				)}
 			</div>
 			{invoice.clientAddress?.state?.trim() && (
-				<p className='text-md font-semibold'>{invoice.clientAddress?.state}</p>
+				<p style={style.value}>{invoice.clientAddress?.state}</p>
 			)}
 			{invoice.clientMobile?.trim() && (
-				<p className='text-md font-semibold'>{invoice.clientMobile}</p>
+				<p style={style.value}>{invoice.clientMobile}</p>
 			)}
 			{invoice.clientEmail?.trim() && (
-				<p className='text-md font-semibold'>{invoice.clientEmail}</p>
+				<p style={style.value}>{invoice.clientEmail}</p>
 			)}
 		</div>
 	);
 }
 
-export default PreviewBilledTo
+export default PreviewBilledTo;

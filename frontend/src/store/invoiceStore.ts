@@ -13,6 +13,8 @@ type InvoiceStore = {
 };
 
 const emptyInvoice: Invoice = {
+	invoiceTitle: "",
+	logo: "",
 	clientName: "",
 	clientEmail: "",
 	clientMobile: "",
@@ -25,8 +27,12 @@ const emptyInvoice: Invoice = {
 	items: [],
 	discount: 0,
 	advancePaid: 0,
+	signature: "",
+	signatureFont: "Dancing Script",
 	total: 0,
 	status: "unpaid",
+	note: "",
+	terms: "",
 };
 
 export const useInvoiceStore = create<InvoiceStore>((set) => ({

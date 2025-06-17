@@ -23,6 +23,8 @@ export interface Deliverable {
 }
 
 export interface Invoice {
+	invoiceTitle: string;
+	logo: string;
 	// Client Details
 	clientName: string;
 	clientAddress?: Address;
@@ -43,9 +45,15 @@ export interface Invoice {
 	// Items
 	items: Deliverable[];
 
+	signature?: string;
+	signatureImg?: string;
+	signatureFont?: string; // or your default font
+
 	// Extra
 	discount?: number;
 	advancePaid?: number;
 	total: number;
 	status: "paid" | "unpaid" | "pending";
+	terms: string;
+	note: string;
 }
