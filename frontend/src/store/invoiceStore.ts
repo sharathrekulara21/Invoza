@@ -5,6 +5,7 @@ type InvoiceStore = {
 	invoice: Invoice;
 	setInvoice: (data: Partial<Invoice>) => void;
 	resetInvoice: () => void;
+	removeItem: (index: number) => void;
 	updateItem: (
 		index: number,
 		field: keyof Deliverable,
@@ -13,8 +14,9 @@ type InvoiceStore = {
 };
 
 const emptyInvoice: Invoice = {
-	invoiceTitle: "",
+	invoiceTitle: "Invoice #01",
 	logo: "",
+	currency: "",
 	clientName: "",
 	clientEmail: "",
 	clientMobile: "",
@@ -33,6 +35,9 @@ const emptyInvoice: Invoice = {
 	status: "unpaid",
 	note: "",
 	terms: "",
+	holderName: "",
+	accountNumber: "",
+	bankName: "",
 };
 
 export const useInvoiceStore = create<InvoiceStore>((set) => ({
@@ -43,6 +48,16 @@ export const useInvoiceStore = create<InvoiceStore>((set) => ({
 			invoice: { ...state.invoice, ...data },
 		})),
 	resetInvoice: () => set(() => ({ invoice: emptyInvoice })),
+	removeItem: (index: number) =>
+		set((state) => {
+			const updatedItems = state.invoice.items.filter((_, i) => i !== index);
+			return {
+				invoice: {
+					...state.invoice,
+					items: updatedItems,
+				},
+			};
+		}),
 	updateItem: (
 		index: number,
 		field: keyof Deliverable,

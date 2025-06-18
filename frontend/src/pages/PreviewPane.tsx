@@ -1,19 +1,9 @@
-import { useInvoiceStore } from "@/store/invoiceStore";
-import PreviewFooter from "../components/previewPane/PreviewFooter";
 import PreviewDeliverables from "../components/previewPane/PreviewDeliverables";
 import PreviewBilledBy from "../components/previewPane/PreviewBilledBy";
 import PreviewBilledTo from "../components/previewPane/PreviewBilledTo";
 import PreviewDates from "../components/previewPane/PreviewDates";
-import { useReactToPrint } from "react-to-print";
-import { useRef } from "react";
-import {
-	Document,
-	Page,
-	Text,
-	View,
-	StyleSheet,
-	Image as PDFImage,
-} from "@react-pdf/renderer";
+import { StyleSheet } from "@react-pdf/renderer";
+import PreviewAdditionalFields from "@/components/previewPane/PreviewAdditionalFields";
 
 const styles = StyleSheet.create({
 	page: {
@@ -239,23 +229,26 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default function PreviewPane() {
-	const { invoice } = useInvoiceStore();
-	const contentRef = useRef<HTMLDivElement>(null);
-	const reactToPrintFn = useReactToPrint({ contentRef });
+export default function PreviewPane({
+	setFieldsEnabled,
+	contentRef,
+	reactToPrintFn,
+	invoice,
+}) {
 	return (
 		<div>
-			<button onClick={reactToPrintFn}>Print</button>
 			<div id='invoice-preview' ref={contentRef} style={styles.page}>
 				<div>
 					<div style={styles.header}>
-						<h2 style={styles.headerTitle}>Invoice Preview</h2>
+						<h2 style={styles.headerTitle}>{invoice.invoiceTitle}</h2>
 						<div style={styles.logo}>
-							<img
-								style={styles.logoImg as React.CSSProperties}
-								src={invoice.logo}
-								alt='logo'
-							/>
+							{invoice.logo && invoice.logo.length > 1 && (
+								<img
+									style={styles.logoImg as React.CSSProperties}
+									src={invoice.logo}
+									alt='logo'
+								/>
+							)}
 						</div>
 					</div>
 					<div style={styles.midSection}>
@@ -265,7 +258,6 @@ export default function PreviewPane() {
 								invoice={invoice}
 								style={styles.invoiceDatesContainer}
 							/>
-							{/* Logo */}
 							<div
 								style={
 									styles.invoiceDatesContainer.maindiv as React.CSSProperties
@@ -284,7 +276,7 @@ export default function PreviewPane() {
 										Holder Name
 									</h2>
 									<p style={styles.invoiceDatesContainer.invoiceDatesValue}>
-										{invoice.billerName}
+										{invoice.holderName}
 									</p>
 								</div>
 								<div
@@ -297,7 +289,7 @@ export default function PreviewPane() {
 										Bank Name
 									</h2>
 									<p style={styles.invoiceDatesContainer.invoiceDatesValue}>
-										HDFC
+										{invoice.bankName}
 									</p>
 								</div>
 								<div
@@ -310,20 +302,7 @@ export default function PreviewPane() {
 										Account Number
 									</h2>
 									<p style={styles.invoiceDatesContainer.invoiceDatesValue}>
-										01992837
-									</p>
-								</div>
-								<div
-									style={
-										styles.invoiceDatesContainer
-											.invoiceDatesRow as React.CSSProperties
-									}
-								>
-									<h2 style={styles.invoiceDatesContainer.invoiceDateslabel}>
-										IFSC
-									</h2>
-									<p style={styles.invoiceDatesContainer.invoiceDatesValue}>
-										01992837
+										{invoice.accountNumber}
 									</p>
 								</div>
 							</div>
@@ -360,57 +339,7 @@ export default function PreviewPane() {
 							gap: 50,
 						}}
 					>
-						<div>
-							{invoice.note.length > 1 && (
-								<div>
-									<h2 style={{ fontWeight: 600, fontSize: 16 }}>Note</h2>
-									<p
-										style={{
-											fontWeight: 400,
-											color: "rgb(156 163 175)",
-											fontSize: 13,
-										}}
-									>
-										{invoice.note}
-									</p>
-								</div>
-							)}
-
-							{invoice.terms.length > 1 && (
-								<div>
-									<h2 style={{ fontWeight: 600, fontSize: 16 }}>
-										Terms and Conditions
-									</h2>
-									<p
-										style={{
-											fontWeight: 400,
-											color: "rgb(156 163 175)",
-											fontSize: 13,
-										}}
-									>
-										{invoice.terms}
-									</p>
-								</div>
-							)}
-						</div>
-						{invoice.signatureImg ? (
-							<img
-								src={invoice.signatureImg}
-								style={{ width: "192px", height: "96px" }}
-							/>
-						) : invoice.signature ? (
-							<div
-								style={{
-									fontFamily: invoice.signatureFont,
-									fontSize: 32,
-									marginTop: 16,
-									width: "192px",
-									height: "96px",
-								}}
-							>
-								{invoice.signature}
-							</div>
-						) : null}
+						<PreviewAdditionalFields invoice={invoice} />
 					</div>
 				</div>
 			</div>

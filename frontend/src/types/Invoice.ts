@@ -25,6 +25,7 @@ export interface Deliverable {
 export interface Invoice {
 	invoiceTitle: string;
 	logo: string;
+	currency: string;
 	// Client Details
 	clientName: string;
 	clientAddress?: Address;
@@ -47,7 +48,12 @@ export interface Invoice {
 
 	signature?: string;
 	signatureImg?: string;
-	signatureFont?: string; // or your default font
+	signatureFont: string; // or your default font
+
+	// Wiring Details
+	holderName: string;
+	accountNumber: string;
+	bankName: string;
 
 	// Extra
 	discount?: number;

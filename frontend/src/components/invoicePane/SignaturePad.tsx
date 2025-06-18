@@ -75,6 +75,7 @@ export default function SignaturePad({ setFieldsEnabled }: SignaturePadProps) {
 				signature: "",
 			});
 		}
+		setFieldsEnabled((prev) => ({ ...prev, showSignaturePad: false }));
 	};
 
 	return (

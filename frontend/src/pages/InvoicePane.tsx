@@ -1,17 +1,22 @@
 import type { Deliverable } from "../types/Invoice";
 import { useInvoiceStore } from "@/store/invoiceStore";
-import { BadgePercent, CloudUpload, PenTool } from "lucide-react";
+import { CloudUpload, PenLine } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import InvoiceDetails from "@/components/invoicePane/InvoiceDetails";
 import BilledTo from "@/components/invoicePane/BilledTo";
 import BilledBy from "@/components/invoicePane/BilledBy";
+import { useReactToPrint } from "react-to-print";
 import Deliverables from "@/components/invoicePane/Deliverables";
 import AdditionalFields from "@/components/invoicePane/AdditionalFields";
-import SignaturePad from "@/components/invoicePane/SignaturePad";
+import PreviewPane from "./PreviewPane";
+import WiringDetails from "@/components/invoicePane/WiringDetails";
+import { CurrencyPicker } from "@/utils/CurrencyPicker";
 
 export default function InvoicePane() {
-	const { invoice, setInvoice, updateItem } = useInvoiceStore();
+	const { invoice, setInvoice, updateItem, removeItem } = useInvoiceStore();
+	const contentRef = useRef<HTMLDivElement>(null);
+	const reactToPrintFn = useReactToPrint({ contentRef });
 	const [logoImage, setLogoImage] = useState("");
 	const [fieldsEnabled, setFieldsEnabled] = useState({
 		showDiscount: false,
@@ -21,6 +26,7 @@ export default function InvoicePane() {
 		showSignaturePad: false,
 		showAddNote: false,
 		showTerms: false,
+		showPreviewPane: false,
 	});
 	const hiddenFileInput = useRef<HTMLInputElement>(null);
 
@@ -91,100 +97,147 @@ export default function InvoicePane() {
 	};
 
 	return (
-		<div className='p-6'>
-			<h1 className='text-2xl font-bold text-center mb-4'>Create Invoice</h1>
-
-			<div className='flex flex-col space-y-5 items-start'>
-				<div className='flex space-y-4 flex-row space-x-4 justify-between items-start w-full '>
-					<InvoiceDetails invoice={invoice} handleChange={handleChange} />
-					<div className='flex border border-dashed hover:border-none rounded-sm w-72 h-52 items-center justify-center'>
-						<label
-							htmlFor='logoUpload'
-							className='group flex flex-col rounded-sm items-center hover:bg-gray-300 transition-colors duration-200 justify-center cursor-pointer w-full h-full'
-						>
-							<CloudUpload className='w-10 text-violet-600 group-hover:text-violet-700 h-10 transition-colors duration-200' />
-							<h2 className='text-gray-400 font-semibold text-sm group-hover:text-gray-500 transition-colors duration-200'>
-								Upload Your logo
-							</h2>
-							<input
-								type='file'
-								name='logo'
-								id='logoUpload'
-								onChange={handleFileChange}
-								ref={hiddenFileInput}
-								className='hidden'
-								accept='image/*'
-							/>
-						</label>
+		<div className='p-6 flex w-full'>
+			<div className='w-[70%]'>
+				<div className='flex justify-center mb-4 w-full'>
+					<div className='flex items-center border-b border-dashed p-1 border-gray-400 hover:border-violet-600 focus:border-gray-90 mx-auto'>
+						<input
+							type='text'
+							name='invoiceNumber'
+							className='text-2xl font-bold text-center focus:outline-none w-full bg-transparent'
+							value={invoice.invoiceTitle}
+							onChange={handleChange}
+						/>
+						<PenLine className='w-6' />
 					</div>
 				</div>
-				<div className='flex flex-col space-y-4 md:flex-row md:space-x-4 items-start w-full'>
-					<BilledTo
-						invoice={invoice}
-						handleChange={handleChange}
-						setInvoice={setInvoice}
-						fieldsEnabled={fieldsEnabled}
-						setFieldsEnabled={setFieldsEnabled}
-					/>
-					<BilledBy
-						invoice={invoice}
-						handleChange={handleChange}
-						setInvoice={setInvoice}
-						fieldsEnabled={fieldsEnabled}
-						setFieldsEnabled={setFieldsEnabled}
-					/>
+				<div className='flex flex-col space-y-5 items-start'>
+					<div className='flex space-y-4 flex-row space-x-4 justify-between items-start w-full '>
+						<InvoiceDetails invoice={invoice} handleChange={handleChange} />
+						<div className='flex border border-dashed hover:border-none rounded-sm w-72 h-52 items-center justify-center'>
+							<label
+								htmlFor='logoUpload'
+								className='group flex flex-col rounded-sm items-center hover:bg-gray-300 transition-colors duration-200 justify-center cursor-pointer w-full h-full'
+							>
+								<CloudUpload className='w-10 text-violet-600 group-hover:text-violet-700 h-10 transition-colors duration-200' />
+								<h2 className='text-gray-400 font-semibold text-sm group-hover:text-gray-500 transition-colors duration-200'>
+									Upload Your logo
+								</h2>
+								<input
+									type='file'
+									name='logo'
+									id='logoUpload'
+									onChange={handleFileChange}
+									ref={hiddenFileInput}
+									className='hidden'
+									accept='image/*'
+								/>
+							</label>
+						</div>
+					</div>
+					<div>
+						<WiringDetails invoice={invoice} handleChange={handleChange} />
+					</div>
+					<div className='flex flex-col space-y-4 md:flex-row md:space-x-4 items-start w-full'>
+						<BilledTo
+							invoice={invoice}
+							handleChange={handleChange}
+							setInvoice={setInvoice}
+							fieldsEnabled={fieldsEnabled}
+							setFieldsEnabled={setFieldsEnabled}
+						/>
+						<BilledBy
+							invoice={invoice}
+							handleChange={handleChange}
+							setInvoice={setInvoice}
+							fieldsEnabled={fieldsEnabled}
+							setFieldsEnabled={setFieldsEnabled}
+						/>
+					</div>
+				</div>
+
+				<hr className='my-4' />
+				<Deliverables
+					invoice={invoice}
+					addItem={addItem}
+					updateItem={updateItem}
+					removeItem={removeItem}
+				/>
+				<hr className='my-4' />
+				<AdditionalFields
+					handleChange={handleChange}
+					invoice={invoice}
+					fieldsEnabled={fieldsEnabled}
+					setFieldsEnabled={setFieldsEnabled}
+				/>
+
+				<hr className='my-4' />
+				<div className='flex items-center justify-between'>
+					<h2 className='text-lg font-semibold mt-4'>Total</h2>
+					<h2 className='font-semibold text-2xl'>{calculateTotal()}</h2>
+				</div>
+				<div className='text-center mt-10'>
+					<Button
+						className='bg-violet-600 hover:bg-violet-600 hover:scale-105 '
+						onClick={handleSubmit}
+					>
+						Prepare invoice
+					</Button>
 				</div>
 			</div>
-
-			<hr className='my-4' />
-			<Deliverables
-				invoice={invoice}
-				addItem={addItem}
-				updateItem={updateItem}
-			/>
-			<hr className='my-4' />
-			<AdditionalFields
-				handleChange={handleChange}
-				invoice={invoice}
-				fieldsEnabled={fieldsEnabled}
-				setFieldsEnabled={setFieldsEnabled}
-			/>
-			{fieldsEnabled.showSignaturePad ? (
-				<div
-					className='fixed inset-0 z-50 flex items-center justify-center  bg-opacity-40'
-					style={{ minHeight: "100vh" }}
-				>
-					<div className='bg-white rounded-lg shadow-lg p-6 max-w-lg w-full'>
-						<SignaturePad setFieldsEnabled={setFieldsEnabled} />
-					</div>
+			<div className='w-[30%]'>
+				<div className='flex items-start justify-center'>
+					<button
+						className='p-3 rounded-sm font-semibold bg-violet-500 text-[#FBFBFB] cursor-pointer hover:bg-violet-700 transition-colors duration-200'
+						onClick={() =>
+							setFieldsEnabled((prev) => ({ ...prev, showPreviewPane: true }))
+						}
+					>
+						Review Invoice
+					</button>
 				</div>
-			) : (
-				<div
-					className='group flex flex-col border border-dashed hover:border-none hover:bg-gray-300 hover:cursor-pointer rounded-sm w-72 h-52 items-center space-y-2 justify-center'
-					onClick={() =>
-						setFieldsEnabled((prev) => ({ ...prev, showSignaturePad: true }))
-					}
-				>
-					<PenTool className='w-10 text-violet-600 group-hover:text-violet-700 h-10 transition-colors duration-200' />
-					<h2 className='text-gray-400 font-semibold text-sm group-hover:text-gray-500 transition-colors duration-200'>
-						Click to add your signature
-					</h2>
+				<div>
+					<CurrencyPicker invoice={invoice} setInvoice={setInvoice} />
+				</div>
+			</div>
+			{fieldsEnabled.showPreviewPane && (
+				<div className='fixed inset-0 z-50 flex items-center justify-center flex-col max-h-[100vh] bg-opacity-40'>
+					<div className='relative bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto p-8'>
+						{/* Close Button */}
+
+						{/* PDF Preview Content */}
+						<div>
+							<PreviewPane
+								setFieldsEnabled={setFieldsEnabled}
+								contentRef={contentRef}
+								reactToPrintFn={reactToPrintFn}
+								invoice={invoice}
+							/>
+						</div>
+						<div className='flex justify-center space-x-2'>
+							<button
+								className='border px-3 py-2 hover:border-violet-400 hover:text-violet-400 transition-colors cursor-pointer duration-200 border-gray-600 text-sm font-semibold rounded-sm'
+								onClick={reactToPrintFn}
+							>
+								Print
+							</button>
+							<button
+								className='border px-3 py-2 hover:border-red-400 hover:text-red-400 transition-colors cursor-pointer duration-200 border-gray-600 text-sm font-semibold rounded-sm'
+								onClick={() =>
+									setFieldsEnabled((prev) => ({
+										...prev,
+										showPreviewPane: false,
+									}))
+								}
+							>
+								Close
+							</button>
+						</div>
+
+						{/* Print Button */}
+					</div>
 				</div>
 			)}
-
-			<hr className="my-4" />
-			<div className='flex items-center justify-between'>
-				<h2 className='text-lg font-semibold mt-4'>Total</h2>
-				<h2 className='font-semibold text-2xl'>{calculateTotal()}</h2>
-			</div>
-			<div className='text-center mt-10'>
-				<Button
-					className='bg-violet-600 hover:bg-violet-600 hover:scale-105 '
-					onClick={handleSubmit}
-				>
-					Prepare invoice
-				</Button>
-			</div>
 		</div>
 	);
 }
