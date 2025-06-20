@@ -2,9 +2,18 @@ import React from "react";
 
 type Props = {};
 
-function PreviewAdditionalFields({invoice}: Props) {
+function PreviewAdditionalFields({ invoice }: Props) {
 	return (
-		<div>
+		<div
+			style={{
+				display: "flex",
+				padding: "0px 28px",
+				marginTop: 10,
+				flexDirection: "row",
+				justifyContent: "space-between",
+				gap: 50,
+			}}
+		>
 			<div>
 				{invoice.note.length > 1 && (
 					<div>
@@ -38,24 +47,26 @@ function PreviewAdditionalFields({invoice}: Props) {
 					</div>
 				)}
 			</div>
-			{invoice.signatureImg ? (
-				<img
-					src={invoice.signatureImg}
-					style={{ width: "192px", height: "96px" }}
-				/>
-			) : invoice.signature ? (
-				<div
-					style={{
-						fontFamily: invoice.signatureFont,
-						fontSize: 32,
-						marginTop: 16,
-						width: "192px",
-						height: "96px",
-					}}
-				>
-					{invoice.signature}
-				</div>
-			) : null}
+			<div>
+				{invoice.signatureImg ? (
+					<img
+						src={invoice.signatureImg}
+						style={{ width: "192px", height: "96px" }}
+					/>
+				) : invoice.signature ? (
+					<div
+						style={{
+							fontFamily: invoice.signatureFont,
+							fontSize: 32,
+							marginTop: 16,
+							width: "192px",
+							height: "96px",
+						}}
+					>
+						{invoice.signature}
+					</div>
+				) : null}
+			</div>
 		</div>
 	);
 }

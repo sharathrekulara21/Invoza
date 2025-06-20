@@ -57,8 +57,11 @@ export interface Invoice {
 
 	// Extra
 	discount?: number;
+	discountType?: "percentage" | "fixed";
 	advancePaid?: number;
 	total: number;
+	tax?: number;
+	taxType?: "percentage" | "fixed";
 	status: "paid" | "unpaid" | "pending";
 	terms: string;
 	note: string;

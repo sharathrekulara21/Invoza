@@ -31,18 +31,18 @@ function BilledBy({
 	return (
 		<div className='bg-gray-200 space-y-2 rounded-lg px-4 py-6 flex flex-col w-full'>
 			<h2 className='md:text-xl font-semibold text-violet-600'>Billed By</h2>
-			<CountryPicker type='biller' />
 			<input
 				type='text'
 				className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
 				name='billerName'
 				value={invoice.billerName}
 				onChange={handleChange}
+				required
 				placeholder='Biller Name/ Business Name'
 			/>
 			<input
 				className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
-				placeholder='Street'
+				placeholder='Street (optional)'
 				name='street'
 				value={invoice.billerAddress?.street}
 				onChange={updatebillerAddress}
@@ -50,24 +50,26 @@ function BilledBy({
 			<div className='flex space-x-2'>
 				<input
 					className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
-					placeholder='City'
+					placeholder='City (optional)'
 					name='city'
 					value={invoice.billerAddress?.city}
 					onChange={updatebillerAddress}
 				/>
 				<input
 					className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
-					placeholder='Postal Code'
+					placeholder='Postal Code (optional)'
 					name='postalCode'
 					value={invoice.billerAddress?.postalCode}
 					onChange={updatebillerAddress}
 				/>
 			</div>
+			<CountryPicker type='biller' />
 			<StatePicker type='biller' country={invoice.billerAddress?.country} />
 			<input
 				name='billerMobile'
 				value={invoice.billerMobile}
 				onChange={handleChange}
+				required
 				placeholder='Biller Mobile'
 				className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
 			/>
@@ -76,7 +78,7 @@ function BilledBy({
 					name='billerEmail'
 					value={invoice.billerEmail}
 					onChange={handleChange}
-					placeholder='Biller Email'
+					placeholder='Biller Email (optional)'
 					className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
 				/>
 			) : (

@@ -31,7 +31,7 @@ function BilledTo({
 	return (
 		<div className='bg-gray-200 space-y-2 rounded-lg px-4 py-6 flex flex-col w-full'>
 			<h2 className='md:text-xl font-semibold text-violet-600'>Billed To</h2>
-			<CountryPicker type='client' />
+
 			<input
 				type='text'
 				className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
@@ -39,10 +39,11 @@ function BilledTo({
 				value={invoice.clientName}
 				onChange={handleChange}
 				placeholder='Client Name/ Business Name'
+				required
 			/>
 			<input
 				className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
-				placeholder='Street'
+				placeholder='Street (optional)'
 				name='street'
 				value={invoice.clientAddress?.street}
 				onChange={updateClientAddress}
@@ -50,7 +51,7 @@ function BilledTo({
 			<div className='flex space-x-2'>
 				<input
 					className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 w-full focus:outline-none'
-					placeholder='City'
+					placeholder='City (optional)'
 					name='city'
 					value={invoice.clientAddress?.city}
 					onChange={updateClientAddress}
@@ -63,6 +64,7 @@ function BilledTo({
 					onChange={updateClientAddress}
 				/>
 			</div>
+			<CountryPicker type='client' />
 			<StatePicker type='client' country={invoice.clientAddress?.country} />
 
 			<input
@@ -70,6 +72,7 @@ function BilledTo({
 				value={invoice.clientMobile}
 				onChange={handleChange}
 				placeholder='Client Mobile'
+				required
 				className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
 			/>
 			{fieldsEnabled.showclientEmail ? (
@@ -77,7 +80,7 @@ function BilledTo({
 					name='clientEmail'
 					value={invoice.clientEmail}
 					onChange={handleChange}
-					placeholder='Client Email'
+					placeholder='Client Email (optional)'
 					className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
 				/>
 			) : (

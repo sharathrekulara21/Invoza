@@ -12,6 +12,7 @@ function WiringDetails({ invoice, handleChange }: Props) {
 				<h2 className='text-sm font-semibold'>Account Holder Name</h2>
 				<input
 					type='text'
+					required
 					className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
 					name='holderName'
 					value={invoice.holderName}
@@ -23,6 +24,7 @@ function WiringDetails({ invoice, handleChange }: Props) {
 				<h2 className='text-sm font-semibold'>Bank Name</h2>
 				<input
 					type='text'
+					required
 					className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
 					name='bankName'
 					value={invoice.bankName}
@@ -35,6 +37,7 @@ function WiringDetails({ invoice, handleChange }: Props) {
 				<h2 className='text-sm font-semibold'>Account Number</h2>
 				<input
 					type='text'
+					required
 					className='border-b p-2 hover:border-violet-600 border-gray-400 focus:border-gray-900 focus:outline-none'
 					name='accountNumber'
 					value={invoice.accountNumber}

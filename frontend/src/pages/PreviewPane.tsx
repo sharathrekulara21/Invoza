@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
 		},
 		colPrice: {
 			flex: 1,
-			textAlign: "end",
+			textAlign: "center",
 		},
 		itemRow: {
 			marginBottom: 8, // mb-2 = 8px
@@ -180,8 +180,16 @@ const styles = StyleSheet.create({
 			justifyContent: "flex-end",
 			marginTop: 24, // mt-6 = 24px
 		},
+		deliveryCurrency: {
+			display: "flex",
+			justifyContent: "center",
+			alignItems: "center",
+			gap: 4,
+		},
 		summaryRow: {
 			display: "flex",
+			justifyContent: "center",
+			alignItems: "center",
 			gap: 16, // gap-4 = 16px
 			padding: 8, // p-2 = 8px
 			fontWeight: 600,
@@ -329,18 +337,8 @@ export default function PreviewPane({
 							style={styles.deliverableStyles}
 						/>
 					</div>
-					<div
-						style={{
-							display: "flex",
-							padding: "0px 28px",
-							marginTop: 10,
-							flexDirection: "row",
-							justifyContent: "space-between",
-							gap: 50,
-						}}
-					>
-						<PreviewAdditionalFields invoice={invoice} />
-					</div>
+
+					<PreviewAdditionalFields invoice={invoice} />
 				</div>
 			</div>
 		</div>

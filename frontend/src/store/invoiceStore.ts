@@ -16,7 +16,7 @@ type InvoiceStore = {
 const emptyInvoice: Invoice = {
 	invoiceTitle: "Invoice #01",
 	logo: "",
-	currency: "",
+	currency: "USD",
 	clientName: "",
 	clientEmail: "",
 	clientMobile: "",
@@ -32,6 +32,9 @@ const emptyInvoice: Invoice = {
 	signature: "",
 	signatureFont: "Dancing Script",
 	total: 0,
+	tax: 0,
+	taxType: "fixed",
+	discountType: "fixed",
 	status: "unpaid",
 	note: "",
 	terms: "",

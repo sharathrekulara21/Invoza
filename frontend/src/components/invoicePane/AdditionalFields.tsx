@@ -1,15 +1,17 @@
 import {
 	BadgePercent,
+	CircleX,
+	Eraser,
 	HandCoins,
 	Handshake,
 	NotebookPen,
 	PenTool,
-	Trash2,
 } from "lucide-react";
-import React from "react";
 import SignaturePad from "./SignaturePad";
+import DiscountTypeSwitch from "@/utils/DiscountTypeSwitch";
 
 type Props = {
+	setInvoice: setInvoice;
 	invoice: invoice;
 	fieldsEnabled: fieldsEnabled;
 	handleChange: handleChange;
@@ -17,6 +19,7 @@ type Props = {
 };
 
 function AdditionalFields({
+	setInvoice,
 	invoice,
 	fieldsEnabled,
 	handleChange,
@@ -30,25 +33,42 @@ function AdditionalFields({
 						<div className='flex space-x-1 justify-between pr-3'>
 							<div className='flex space-x-2 p-2'>
 								<BadgePercent className='w-5' />
-								<h2 className='text-sm font-medium text-gray-900'>Discount</h2>
+								<h2 className='text-sm font-medium text-gray-900 mr-5'>
+									Discount
+								</h2>
+								<div className=''>
+									<DiscountTypeSwitch
+										setInvoice={setInvoice}
+										invoice={invoice}
+									/>
+								</div>
 							</div>
 						</div>
 						<div className='flex space-x-1 items-center pr-3'>
-							<input
-								name='discount'
-								className='border rounded-sm border-gray-500 focus:outline-none text-end p-2 mr-2'
-								placeholder='0'
-								value={invoice.discount}
-								onChange={handleChange}
-							/>
-							<Trash2
+							<div className='flex space-x-2 items-center'>
+								{invoice.discountType === "fixed" ? (
+									<span className='font-semibold'>{invoice.currency}</span>
+								) : (
+									<span className='font-semibold'>%</span>
+								)}
+
+								<input
+									name='discount'
+									type='number'
+									className='border rounded-sm border-gray-500 focus:outline-none text-end p-2 mr-2 hover:border-violet-400 focus:border-violet-700 focus:ring-violet-900 transition-colors duration-200'
+									placeholder='Enter discount'
+									value={invoice.discount === 0 ? "" : invoice.discount}
+									onChange={handleChange}
+									onWheel={(e) => e.currentTarget.blur()}
+								/>
+							</div>
+							<Eraser
 								className='w-5 hover:text-red-500 cursor-pointer transition-colors duration-300'
-								onClick={() => {
-									setFieldsEnabled((prev) => ({
-										...prev,
-										showDiscount: false,
-									}));
-								}}
+								onClick={() => setInvoice({ discount: 0 })}
+							/>
+							<CircleX
+								className='w-5 hover:scale-120 cursor-pointer transition-all duration-300'
+								onClick={() => setFieldsEnabled({ showDiscount: false })}
 							/>
 						</div>
 					</div>
@@ -80,18 +100,27 @@ function AdditionalFields({
 						</div>
 
 						<div className='flex space-x-1 items-center pr-3'>
-							<input
-								name='advancePaid'
-								className='border rounded-sm border-gray-500 focus:outline-none text-end p-2 mr-2'
-								placeholder='Advance'
-								value={invoice.advancePaid}
-								onChange={handleChange}
-							/>
-							<Trash2
+							<div className='flex space-x-2 items-center'>
+								<span className='font-semibold'>{invoice.currency}</span>
+								<input
+									name='advancePaid'
+									type='number'
+									onWheel={(e) => e.currentTarget.blur()}
+									className='border rounded-sm border-gray-500 focus:outline-none text-end p-2 mr-2 hover:border-violet-400 focus:border-violet-700 focus:ring-violet-900 transition-colors duration-200'
+									placeholder='Enter advance'
+									value={invoice.advancePaid === 0 ? "" : invoice.advancePaid}
+									onChange={handleChange}
+								/>
+							</div>
+							<Eraser
 								className='w-5 hover:text-red-500 cursor-pointer transition-colors duration-300'
-								onClick={() => {
-									setFieldsEnabled((prev) => ({ ...prev, showAdvance: false }));
-								}}
+								onClick={() => setInvoice({ advancePaid: 0 })}
+							/>
+							<CircleX
+								className='w-5 hover:scale-120  cursor-pointer transition-all duration-300'
+								onClick={() =>
+									setFieldsEnabled((p) => ({ ...p, showAdvance: false }))
+								}
 							/>
 						</div>
 					</div>
@@ -118,8 +147,8 @@ function AdditionalFields({
 								<NotebookPen className='w-5' />
 								<h2 className='text-sm font-medium text-gray-900'>Add Note</h2>
 							</div>
-							<Trash2
-								className='w-5 hover:text-red-500 cursor-pointer transition-colors duration-300'
+							<CircleX
+								className='w-5 hover:scale-120 cursor-pointer transition-all duration-300'
 								onClick={() => {
 									setFieldsEnabled((prev) => ({ ...prev, showAddNote: false }));
 								}}
@@ -128,7 +157,7 @@ function AdditionalFields({
 						<textarea
 							name='note'
 							rows={3}
-							className='border-1 rounded-sm border-gray-500 focus:outline-none text-base p-2 mr-2'
+							className='border-1 rounded-sm border-gray-500 focus:outline-none text-base p-2 mr-2 hover:border-violet-400 focus:border-violet-700 focus:ring-violet-900 transition-colors duration-200'
 							placeholder='Add a note here..'
 							value={invoice.note}
 							onChange={handleChange}
@@ -159,8 +188,8 @@ function AdditionalFields({
 									Add Terms and Conditions
 								</h2>
 							</div>
-							<Trash2
-								className='w-5 hover:text-red-500 cursor-pointer transition-colors duration-300'
+							<CircleX
+								className='w-5 hover:scale-120  cursor-pointer transition-all duration-300'
 								onClick={() => {
 									setFieldsEnabled((prev) => ({ ...prev, showTerms: false }));
 								}}
@@ -170,7 +199,7 @@ function AdditionalFields({
 						<textarea
 							name='terms'
 							rows={3}
-							className='border-1 rounded-sm border-gray-500 focus:outline-none text-base p-2'
+							className='border-1 rounded-sm border-gray-500 focus:outline-none text-base p-2 hover:border-violet-400 focus:border-violet-700 focus:ring-violet-900 transition-colors duration-200'
 							placeholder='Add terms and conditions here..'
 							value={invoice.terms}
 							onChange={handleChange}
@@ -208,10 +237,27 @@ function AdditionalFields({
 							setFieldsEnabled((prev) => ({ ...prev, showSignaturePad: true }))
 						}
 					>
-						<PenTool className='w-10 text-gray-600 group-hover:text-violet-400 h-10 transition-colors duration-200' />
-						<h2 className='text-gray-400 font-semibold text-sm group-hover:text-violet-400 transition-colors duration-200'>
-							Click to add your signature
-						</h2>
+						{invoice.signature.length > 1 || invoice.signatureImg ? (
+							invoice.signature ? (
+								<span style={{ fontFamily: invoice.signatureFont }}>
+									{invoice.signature}
+								</span>
+							) : (
+								<img
+									src={invoice.signatureImg}
+									alt='Signature'
+									style={{ maxHeight: 80 }}
+								/>
+							)
+						) : (
+							<>
+								<PenTool className='w-10 text-gray-600 group-hover:text-violet-400 h-10 transition-colors duration-200' />
+								<h2 className='text-gray-400 font-semibold text-sm group-hover:text-violet-400 transition-colors duration-200'>
+									Click to add your signature
+								</h2>
+							</>
+							)}
+							
 					</div>
 				)}
 			</div>

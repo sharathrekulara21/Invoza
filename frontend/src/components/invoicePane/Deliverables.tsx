@@ -18,7 +18,7 @@ function Deliverables({ invoice, addItem, updateItem, removeItem }: Props) {
 							Name
 						</th>
 						<th className='p-2 text-center'>Quantity</th>
-						<th className='p-2 text-center'>Price</th>
+						<th className='p-2 text-start'>Price</th>
 						<th className='p-2 text-center rounded-tr'>Action</th>
 					</tr>
 				</thead>
@@ -27,6 +27,7 @@ function Deliverables({ invoice, addItem, updateItem, removeItem }: Props) {
 						<tr key={item.id} className='bg-gray-100'>
 							<td className='p-2 min-w-[100px] sm:min-w-[180px] md:min-w-[240px]'>
 								<input
+									required
 									className='w-full p-2 rounded focus:outline-none'
 									placeholder='Name'
 									value={item.name}
@@ -35,19 +36,32 @@ function Deliverables({ invoice, addItem, updateItem, removeItem }: Props) {
 							</td>
 							<td className='p-2 text-center'>
 								<input
+									type='number'
+									required
+									min={1}
+									placeholder='Quantity'
+									onWheel={(e) => e.currentTarget.blur()}
 									className='w-full p-2 rounded text-center focus:outline-none'
-									placeholder='Qty'
 									value={item.quantity}
 									onChange={(e) => updateItem(idx, "quantity", +e.target.value)}
 								/>
 							</td>
-							<td className='p-2 text-center'>
-								<input
-									className='w-full p-2 rounded text-center focus:outline-none'
-									placeholder='Price'
-									value={item.price}
-									onChange={(e) => updateItem(idx, "price", +e.target.value)}
-								/>
+							<td className='p-2 text-start'>
+								<div className='flex items-center justify-start'>
+									<span>{invoice.currency}</span>
+									<input
+										type='number'
+										required
+										placeholder='0'
+										onWheel={(e) => e.currentTarget.blur()}
+										className='p-2 rounded text-start focus:outline-none'
+										value={item.price === 0 ? "" : item.price}
+										onChange={(e) => {
+											const val = +e.target.value;
+											updateItem(idx, "price", val);
+										}}
+									/>
+								</div>
 							</td>
 							<td className='px-2 py-2 text-center'>
 								<button

@@ -19,7 +19,7 @@ export function CurrencyPicker({ invoice, setInvoice }) {
 
 	return (
 		<Select value={invoice.currency} onValueChange={handleChange}>
-			<SelectTrigger className='w-full border-b border-gray-900'>
+			<SelectTrigger className='border-b border-gray-900'>
 				<SelectValue placeholder='Choose Currency' />
 			</SelectTrigger>
 			<SelectContent>
@@ -35,3 +35,5 @@ export function CurrencyPicker({ invoice, setInvoice }) {
 		</Select>
 	);
 }
+
+
