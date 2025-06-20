@@ -1,9 +1,9 @@
-import InvoicePage from "./pages/InvoicePage";
+import InvoicePane from "./pages/InvoicePane";
 
 function App() {
 	return (
 		<>
-			<InvoicePage/>
+			<InvoicePane />
 		</>
 	);
 }
